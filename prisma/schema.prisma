@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id           BigInt    @id @default(autoincrement())
+  name      String   // New field for the user's name
+  email     String   @unique // New field for the user's email, marked as unique
+  sessions     Session[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Session {
+  id           BigInt            @id @default(autoincrement())
+  userId       BigInt
+  user         User              @relation(fields: [userId], references: [id])
+  sessionExercises SessionExercise[]
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+}
+
+model Exercise {
+  id           BigInt             @id @default(autoincrement())
+  name         String
+  sessionExercises SessionExercise[]
+  exerciseFocusAreas ExerciseFocusArea[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+}
+
+model SessionExercise {
+  id           BigInt             @id @default(autoincrement())
+  sessionId    BigInt
+  exerciseId   BigInt
+  session      Session            @relation(fields: [sessionId], references: [id])
+  exercise     Exercise           @relation(fields: [exerciseId], references: [id])
+  sessionExerciseSets SessionExerciseSet[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+}
+
+model FocusArea {
+  id           BigInt             @id @default(autoincrement())
+  name         String
+  muscleGroup  String
+  exerciseFocusAreas ExerciseFocusArea[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+}
+
+model ExerciseFocusArea {
+  id           BigInt             @id @default(autoincrement())
+  exerciseId   BigInt
+  focusAreaId  BigInt
+  exercise     Exercise           @relation(fields: [exerciseId], references: [id])
+  focusArea    FocusArea          @relation(fields: [focusAreaId], references: [id])
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+}
+
+model SessionExerciseSet {
+  id               BigInt             @id @default(autoincrement())
+  sessionExerciseId BigInt
+  roundCount       Int
+  weight           BigInt
+  weightUnitId     Int
+  sessionExercise  SessionExercise    @relation(fields: [sessionExerciseId], references: [id])
+  weightUnit       WeightUnit         @relation(fields: [weightUnitId], references: [id])
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+}
+
+model WeightUnit {
+  id           Int                @id @default(autoincrement())
+  name         String
+  sessionExerciseSets SessionExerciseSet[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+}
