@@ -3,16 +3,18 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url  	    = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
   id                   String        @id @default(cuid())
   name                 String        @db.Text
   email                String        @db.Text @unique
-  emailVerified DateTime?
-  image         String?
+  emailVerified        DateTime?
+  password             String?
+  image                String?
   status               UserStatus
   gymSessions          GymSession[]
   accounts             Account[]
